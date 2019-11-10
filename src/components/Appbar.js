@@ -40,10 +40,7 @@ export default function ElevateAppBar(props) {
             <ElevationScroll {...props}>
                 <AppBar>
                     <Toolbar>
-                        <TemporaryDrawer
-                            setOpen={props.setOpen}
-                            addToken={props.addToken}
-                        />
+                        <TemporaryDrawer />
                         <Typography variant="subtitle1">LFS Admin</Typography>
                     </Toolbar>
                 </AppBar>

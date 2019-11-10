@@ -9,6 +9,9 @@ import MailIcon from "@material-ui/icons/Mail";
 import { IconButton } from "@material-ui/core";
 import MenuIcon from "@material-ui/icons/Menu";
 
+import { addToken, toggleAddDialog } from "../store/actions";
+import { connect } from "react-redux";
+
 const useStyles = makeStyles(theme => ({
     list: {
         width: 250
@@ -21,7 +24,7 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-export default function TemporaryDrawer({ setOpen, addToken }) {
+function AppDrawer({ toggleAddDialog, addToken }) {
     const classes = useStyles();
     const [state, setState] = React.useState(false);
 
@@ -36,14 +39,8 @@ export default function TemporaryDrawer({ setOpen, addToken }) {
         setState(open);
     };
 
-    const addCards = () => event => {
-        console.log(event, "Add Cards");
-        toggleDrawer(false, { type: "Pass" });
-    };
-
     const addMerchants = () => event => {
-        setOpen(true);
-        console.log(event, "Add Merchants");
+        toggleAddDialog(true);
         toggleDrawer(false, { type: "Pass" });
     };
 
@@ -87,17 +84,6 @@ export default function TemporaryDrawer({ setOpen, addToken }) {
                         </ListItem>
                         <ListItem
                             button
-                            key="Add Cards"
-                            onClick={addCards()}
-                            onKeyDown={addCards()}
-                        >
-                            <ListItemIcon>
-                                <MailIcon />
-                            </ListItemIcon>
-                            <ListItemText primary="Add Cards" />
-                        </ListItem>
-                        <ListItem
-                            button
                             key="Logout"
                             onClick={logout()}
                             onKeyDown={logout()}
@@ -113,3 +99,18 @@ export default function TemporaryDrawer({ setOpen, addToken }) {
         </div>
     );
 }
+
+const mapDispatchToProps = dispatch => {
+    return {
+        addToken: token => dispatch(addToken(token)),
+
+        toggleAddDialog: status => dispatch(toggleAddDialog(status))
+    };
+};
+
+const TemporaryDrawer = connect(
+    null,
+    mapDispatchToProps
+)(AppDrawer);
+
+export default TemporaryDrawer;

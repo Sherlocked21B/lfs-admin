@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
 import Dialog from "@material-ui/core/Dialog";
@@ -11,8 +11,7 @@ import CloseIcon from "@material-ui/icons/Close";
 import Slide from "@material-ui/core/Slide";
 import InputWithIcon from "./Input";
 
-import { createMerchant } from "../api/main";
-import { toggleAddDialog, setMessage, toggleSnackBar } from "../store/actions";
+import { toggleEditDialog } from "../store/actions";
 import { connect } from "react-redux";
 
 const useStyles = makeStyles(theme => ({
@@ -29,16 +28,15 @@ const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
 });
 
-function AddDialog({
-    isAddDialogOpen,
-    toggleAddDialog,
-    token,
-    toggleSnackBar,
-    setMessage
+function EditMerchantsDialog({
+    isEditDialogOpen,
+    toggleEditDialog,
+    edit,
+    token
 }) {
     const classes = useStyles();
     const handleClose = () => {
-        toggleAddDialog(false);
+        toggleEditDialog(false);
     };
 
     const [id, setId] = useState(null);
@@ -46,12 +44,31 @@ function AddDialog({
     const [email, setEmail] = useState("");
     const [address, setAddress] = useState("");
     const [location, setLocation] = useState({
-        latitude: "",
-        longitude: ""
+        latitude: null,
+        longitude: null
     });
     const [category, setCategory] = useState("");
     const [description, setDescription] = useState("");
+    const [media, setMedia] = useState(null);
     const [contact, setContact] = useState("");
+
+    useEffect(() => {
+        if (Object.keys(edit).length > 0 && edit.constructor === Object) {
+            console.log(edit);
+            setId(edit._id);
+            setName(edit.name);
+            setEmail(edit.email);
+            setAddress(edit.address);
+            setLocation({
+                latitude: edit.location[0] || "N/A",
+                longitude: edit.location[1] || "N/A"
+            });
+            setCategory(edit.category);
+            setDescription(edit.description);
+            setMedia(edit.media.src);
+            setContact(edit.contact);
+        }
+    }, [edit]);
 
     const handleSave = () => {
         const data = Object.freeze({
@@ -63,23 +80,17 @@ function AddDialog({
             // description: description ,
             contact: contact
         });
-        createMerchant({ token, body: JSON.stringify(data) }).then(res => {
-            if (res.message) {
-                setMessage("Merchant created successfully!");
-                toggleSnackBar(true);
-                handleClose();
-            } else {
-                setMessage("Error creating merchant!");
-                toggleSnackBar(true);
-            }
-        });
+        console.log(data);
+        // createMerchant({ token, body: JSON.stringify(data) }).then(res => {
+        //     console.log(res);
+        // });
     };
 
     return (
         <div>
             <Dialog
                 fullScreen
-                open={isAddDialogOpen}
+                open={isEditDialogOpen}
                 onClose={handleClose}
                 TransitionComponent={Transition}
             >
@@ -94,7 +105,7 @@ function AddDialog({
                             <CloseIcon />
                         </IconButton>
                         <Typography variant="h6" className={classes.title}>
-                            Add Merchants
+                            {edit.name}
                         </Typography>
                         <Button autoFocus color="inherit" onClick={handleSave}>
                             save
@@ -117,6 +128,7 @@ function AddDialog({
                         setDescription={setDescription}
                         contact={contact}
                         setContact={setContact}
+                        setMedia={setMedia}
                         id={id}
                     />
                 </List>
@@ -127,22 +139,21 @@ function AddDialog({
 
 const mapDispatchToProps = dispatch => {
     return {
-        toggleAddDialog: status => dispatch(toggleAddDialog(status)),
-        setMessage: value => dispatch(setMessage(value)),
-        toggleSnackBar: value => dispatch(toggleSnackBar(value))
+        toggleEditDialog: status => dispatch(toggleEditDialog(status))
     };
 };
 
 const mapStateToProps = state => {
     return {
         token: state.token,
-        isAddDialogOpen: state.isAddDialogOpen
+        isEditDialogOpen: state.isEditDialogOpen,
+        edit: state.edit
     };
 };
 
-const FullScreenDialog = connect(
+const EditDialog = connect(
     mapStateToProps,
     mapDispatchToProps
-)(AddDialog);
+)(EditMerchantsDialog);
 
-export default FullScreenDialog;
+export default EditDialog;

@@ -9,6 +9,7 @@ import FormControl from "@material-ui/core/FormControl";
 import Visibility from "@material-ui/icons/Visibility";
 import VisibilityOff from "@material-ui/icons/VisibilityOff";
 import { Button, Checkbox, FormControlLabel } from "@material-ui/core";
+
 import { verifyToken } from "../api/main";
 import { addToken } from "../store/actions";
 import { connect } from "react-redux";
@@ -121,20 +122,8 @@ function Login({ addToken }) {
 const mapDispatchToProps = dispatch => {
     return {
         addToken: token => dispatch(addToken(token))
-        // addMerchants: merchants => dispatch(addMerchants(merchants)),
-        // addMaxCount: maxCount => dispatch(addMaxCount(maxCount)),
-        // setPage: page => dispatch(setPage(page))
     };
 };
-
-// const mapStateToProps = state => {
-//   return {
-//       token: state.token,
-//       merchants: state.merchants,
-//       maxCount: state.maxCount,
-//       page: state.page
-//   };
-// };
 
 const InputAdornments = connect(
     null,

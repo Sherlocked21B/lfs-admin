@@ -17,9 +17,44 @@ import Remove from "@material-ui/icons/Remove";
 import SaveAlt from "@material-ui/icons/SaveAlt";
 import Search from "@material-ui/icons/Search";
 import ViewColumn from "@material-ui/icons/ViewColumn";
-import { Chip, Button } from "@material-ui/core";
+import Dialog from "@material-ui/core/Dialog";
+import DialogActions from "@material-ui/core/DialogActions";
+import DialogContent from "@material-ui/core/DialogContent";
+import DialogContentText from "@material-ui/core/DialogContentText";
+import DialogTitle from "@material-ui/core/DialogTitle";
+import { Chip, Button, CircularProgress } from "@material-ui/core";
+import { deleteMerchant } from "../api/main";
 
-export default function MaterialTableDemo({ merchants, setOpen, setEdit }) {
+import {
+    removeMerchant,
+    toggleEditDialog,
+    setEdit,
+    setMessage,
+    toggleSnackBar
+} from "../store/actions";
+import { connect } from "react-redux";
+
+function MerchantsTable({
+    merchants,
+    toggleEditDialog,
+    setEdit,
+    token,
+    removeMerchant,
+    setMessage,
+    toggleSnackBar
+}) {
+    const [confirm, setConfirm] = React.useState(false);
+    const [deleteData, setDeleteData] = React.useState(null);
+    const [isDeleting, setDeleting] = React.useState(false);
+
+    const handleClickOpen = () => {
+        setConfirm(true);
+    };
+
+    const handleClose = () => {
+        setConfirm(false);
+    };
+
     const columns = [
         { title: "Name", field: "name" },
         { title: "Email", field: "mail" },
@@ -49,26 +84,50 @@ export default function MaterialTableDemo({ merchants, setOpen, setEdit }) {
             )
         },
         { title: "Address", field: "address" },
-        { title: "Contact", field: "contact" },
-        { title: "Location", field: "location" },
+        {
+            title: "Contact",
+            field: "contact"
+        },
+        {
+            title: "Location",
+            field: "location",
+            render: rowData => (
+                <>
+                    {rowData.location === undefined ||
+                    rowData.location === null ? (
+                        <p>N/A</p>
+                    ) : (
+                        <>
+                            <span>{rowData.location[0]}</span>
+                            <br />
+                            <span>{rowData.location[1]}</span>
+                        </>
+                    )}
+                </>
+            )
+        },
         { title: "Description", field: "description" },
         {
             title: "Images",
             field: "url",
             render: rowData => (
                 <>
-                    {rowData.media.src.map(each => (
-                        <img
-                            alt={rowData.name}
-                            src={each}
-                            style={{
-                                width: 50,
-                                height: 50,
-                                borderRadius: "50%",
-                                border: "2px solid #333"
-                            }}
-                        />
-                    ))}
+                    {rowData.media === undefined || rowData.media === null ? (
+                        <p>N/A</p>
+                    ) : (
+                        rowData.media.src.map(each => (
+                            <img
+                                alt={rowData.name}
+                                src={each}
+                                style={{
+                                    width: 50,
+                                    height: 50,
+                                    borderRadius: "50%",
+                                    border: "2px solid #333"
+                                }}
+                            />
+                        ))
+                    )}
                 </>
             ),
             editComponent: rowData => (
@@ -86,51 +145,91 @@ export default function MaterialTableDemo({ merchants, setOpen, setEdit }) {
         }
     ];
 
-    const editable = {
-        onRowAdd: newData =>
-            new Promise(resolve => {
-                console.log(newData);
-                resolve();
-            }),
-        onRowUpdate: (newData, oldData) =>
-            new Promise(resolve => {
-                console.log(newData, oldData);
-                resolve();
-            }),
-        onRowDelete: oldData =>
-            new Promise(resolve => {
-                console.log(oldData);
-                resolve();
-            })
-    };
-
     const actions = [
         {
             icon: tableIcons.Edit,
             tooltip: "Edit Merchant",
             onClick: (e, rowData) => {
                 setEdit(rowData);
-                setOpen(true);
+                toggleEditDialog(true);
             }
         },
         {
             icon: tableIcons.Delete,
             tooltip: "Delete Merchant",
             onClick: (event, rowData) => {
-                console.log(rowData);
+                setDeleteData(rowData);
+                handleClickOpen();
             }
         }
     ];
 
     return (
-        <MaterialTable
-            title="Merchants"
-            columns={columns}
-            icons={tableIcons}
-            data={merchants}
-            // editable={editable}
-            actions={actions}
-        />
+        <>
+            <MaterialTable
+                title="Merchants"
+                columns={columns}
+                icons={tableIcons}
+                data={merchants}
+                actions={actions}
+            />
+            <Dialog
+                open={confirm}
+                onClose={handleClose}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <DialogTitle id="alert-dialog-title">
+                    {`Are yo sure you want to delete ${
+                        deleteData !== null ? deleteData.name : null
+                    }?`}
+                </DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="alert-dialog-description">
+                        If you click Delete all the data related to{" "}
+                        {deleteData !== null ? (
+                            <b>{deleteData.name}</b>
+                        ) : (
+                            "Merchant"
+                        )}{" "}
+                        will be deleted permanently.
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleClose} color="primary">
+                        Cancel
+                    </Button>
+                    <Button
+                        onClick={() => {
+                            setDeleting(true);
+                            deleteMerchant({ token, id: deleteData._id }).then(
+                                data => {
+                                    console.log(data);
+                                    if (data.message) {
+                                        removeMerchant(deleteData._id);
+                                        handleClose();
+                                        setMessage(
+                                            `Deleted ${deleteData.name} successfully!`
+                                        );
+                                        toggleSnackBar(true);
+                                    } else {
+                                        setMessage(
+                                            `Failed to delete ${deleteData.name}!`
+                                        );
+                                        toggleSnackBar(true);
+                                    }
+                                    setDeleting(false);
+                                }
+                            );
+                        }}
+                        color="primary"
+                        autoFocus
+                    >
+                        {isDeleting === false ? "Delete" : <CircularProgress />}
+                    </Button>
+                </DialogActions>
+            </Dialog>
+        </>
     );
 }
 
@@ -159,3 +258,27 @@ const tableIcons = {
     )),
     ViewColumn: forwardRef((props, ref) => <ViewColumn {...props} ref={ref} />)
 };
+
+const mapDispatchToProps = dispatch => {
+    return {
+        removeMerchant: id => dispatch(removeMerchant(id)),
+        toggleEditDialog: status => dispatch(toggleEditDialog(status)),
+        setEdit: edit => dispatch(setEdit(edit)),
+        setMessage: value => dispatch(setMessage(value)),
+        toggleSnackBar: value => dispatch(toggleSnackBar(value))
+    };
+};
+
+const mapStateToProps = state => {
+    return {
+        token: state.token,
+        merchants: state.merchants
+    };
+};
+
+const MaterialTableDemo = connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(MerchantsTable);
+
+export default MaterialTableDemo;

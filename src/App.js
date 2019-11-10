@@ -1,15 +1,19 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
+import { connect } from "react-redux";
+
+import { addMerchants, addMaxCount, setPage } from "./store/actions";
+import { fetchMerchants } from "./api/main";
+
 import FullScreenDialog from "./components/Dialog";
 import ElevateAppBar from "./components/Appbar";
 import MaterialTableDemo from "./components/Table";
-import { fetchMerchants } from "./api/main";
-import { addToken, addMerchants, addMaxCount, setPage } from "./store/actions";
-import { connect } from "react-redux";
 import InputAdornments from "./components/Login";
+import EditDialog from "./components/EditDialog";
+import CustomizedSnackbars from "./components/Snackbar";
+import CardsTable from "./components/CardsTable";
 
 function MainApp({
     token,
-    addToken,
     maxCount,
     addMerchants,
     addMaxCount,
@@ -17,8 +21,6 @@ function MainApp({
     page,
     setPage
 }) {
-    const [open, setOpen] = useState(false);
-    const [edit, setEdit] = useState(null);
     useEffect(() => {
         fetchMerchants(page)
             .then(data => {
@@ -52,18 +54,12 @@ function MainApp({
                 <InputAdornments />
             ) : (
                 <>
-                    <ElevateAppBar setOpen={setOpen} addToken={addToken} />
-                    <FullScreenDialog
-                        open={open}
-                        setOpen={setOpen}
-                        edit={edit}
-                        setEdit={setEdit}
-                    />
-                    <MaterialTableDemo
-                        merchants={merchants}
-                        setOpen={setOpen}
-                        setEdit={setEdit}
-                    />
+                    <ElevateAppBar />
+                    <FullScreenDialog />
+                    <MaterialTableDemo />
+                    <EditDialog />
+                    <CustomizedSnackbars type="success" />
+                    <CardsTable />
                 </>
             )}
         </div>
@@ -72,7 +68,6 @@ function MainApp({
 
 const mapDispatchToProps = dispatch => {
     return {
-        addToken: token => dispatch(addToken(token)),
         addMerchants: merchants => dispatch(addMerchants(merchants)),
         addMaxCount: maxCount => dispatch(addMaxCount(maxCount)),
         setPage: page => dispatch(setPage(page))
