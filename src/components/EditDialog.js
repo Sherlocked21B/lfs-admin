@@ -65,7 +65,7 @@ function EditMerchantsDialog({
             });
             setCategory(edit.category);
             setDescription(edit.description);
-            setMedia(edit.media.src);
+            setMedia(edit.media !== undefined ? edit.media.src : null);
             setContact(edit.contact);
         }
     }, [edit]);
