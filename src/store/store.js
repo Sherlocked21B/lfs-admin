@@ -1,6 +1,14 @@
-import { createStore } from "redux"
-import rootReducer from "./reducers"
+import { createStore, combineReducers } from "redux";
+import merchantsReducer from "./reducers/merchants";
+import cardsReducer from "./reducers/cards";
+import uiReducer from "./reducers/ui";
 
-const store = createStore(rootReducer)
+const rootReducer = combineReducers({
+    merchant: merchantsReducer,
+    card: cardsReducer,
+    ui: uiReducer
+});
 
-export default store
+const store = createStore(rootReducer);
+
+export default store;

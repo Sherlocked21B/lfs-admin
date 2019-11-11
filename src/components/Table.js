@@ -271,8 +271,8 @@ const mapDispatchToProps = dispatch => {
 
 const mapStateToProps = state => {
     return {
-        token: state.token,
-        merchants: state.merchants
+        token: state.merchant.token,
+        merchants: state.merchant.merchants
     };
 };
 

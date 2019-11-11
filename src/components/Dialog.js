@@ -135,8 +135,8 @@ const mapDispatchToProps = dispatch => {
 
 const mapStateToProps = state => {
     return {
-        token: state.token,
-        isAddDialogOpen: state.isAddDialogOpen
+        token: state.merchant.token,
+        isAddDialogOpen: state.ui.isAddDialogOpen
     };
 };
 

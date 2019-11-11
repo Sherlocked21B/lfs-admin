@@ -18,49 +18,65 @@ import Search from "@material-ui/icons/Search";
 import ViewColumn from "@material-ui/icons/ViewColumn";
 
 import {
-    removeMerchant,
-    toggleEditDialog,
-    setEdit,
     setMessage,
-    toggleSnackBar
+    toggleSnackBar,
+    addCards,
+    removeCard
 } from "../store/actions";
 import { connect } from "react-redux";
+import { createCard, deleteCard, updateCard } from "../api/main";
 
-function Cards() {
+function Cards({ cards, token, addCards, removeCard }) {
     const columns = [
-        { title: "Card Id", field: "card_id" },
-        { title: "Name", field: "name" }
-    ];
-    const [data, setData] = React.useState([
+        { title: "Card Id", field: "card" },
+        { title: "User", field: "user" },
         {
-            name: "Mehmet",
-            card_id: "011111"
-        },
-        {
-            name: "Zerya Betül",
-            card_id: "0111111"
+            title: "Timestamp",
+            field: "timestamp",
+            editComponent: value => <></>,
+            render: rowData => (
+                <div>{new Date(rowData.timestamp).toUTCString()}</div>
+            )
         }
-    ]);
+    ];
 
     const editable = {
         onRowAdd: newData =>
             new Promise(resolve => {
-                setTimeout(() => {
+                createCard(
+                    JSON.stringify({
+                        card: newData.card,
+                        user: newData.user || ""
+                    }),
+                    token
+                ).then(data => {
+                    if (data.message) {
+                        addCards([data.card]);
+                    }
                     resolve();
-                    setData([...data, newData]);
-                }, 600);
+                });
             }),
         onRowUpdate: (newData, oldData) =>
             new Promise(resolve => {
-                setTimeout(() => {
-                    resolve();
-                }, 600);
+                updateCard(oldData._id, JSON.stringify(newData), token).then(
+                    data => {
+                        if (!data.error && data.message) {
+                            console.log(data);
+                            removeCard(oldData._id);
+                            addCards([data.card]);
+                        }
+                        resolve();
+                    }
+                );
             }),
         onRowDelete: oldData =>
             new Promise(resolve => {
-                setTimeout(() => {
+                deleteCard(oldData._id, token).then(data => {
+                    if (!data.error && data.message) {
+                        removeCard(oldData._id);
+                    }
                     resolve();
-                }, 600);
+                });
             })
     };
 
@@ -68,27 +84,24 @@ function Cards() {
         <MaterialTable
             title="LFS cards and users"
             columns={columns}
-            data={data}
+            data={cards}
             icons={tableIcons}
             editable={editable}
         />
     );
 }
 
-const mapDispatchToProps = dispatch => {
-    return {
-        removeMerchant: id => dispatch(removeMerchant(id)),
-        toggleEditDialog: status => dispatch(toggleEditDialog(status)),
-        setEdit: edit => dispatch(setEdit(edit)),
-        setMessage: value => dispatch(setMessage(value)),
-        toggleSnackBar: value => dispatch(toggleSnackBar(value))
-    };
+const mapDispatchToProps = {
+    addCards,
+    setMessage,
+    toggleSnackBar,
+    removeCard
 };
 
 const mapStateToProps = state => {
     return {
-        token: state.token,
-        merchants: state.merchants
+        token: state.merchant.token,
+        cards: state.card.cards
     };
 };
 

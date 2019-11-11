@@ -1,4 +1,5 @@
 const url = "https://lfscards.herokuapp.com/merchants";
+const cardsUrl = "https://lfscards.herokuapp.com/cards";
 
 export const updateMerchants = ({ id, token, body }) => {
     return fetch(`${url}/${id}`, {
@@ -78,6 +79,55 @@ export const verifyToken = token => {
 
 export const fetchMerchants = page => {
     return fetch(`${url}/${page}`)
+        .then(res => res.json())
+        .catch(err => err);
+};
+
+export const getCards = (page, token) => {
+    return fetch(`${cardsUrl}/all/${page}`, {
+        headers: {
+            "Content-Type": "application/json",
+            "X-Access-Token": token
+        }
+    })
+        .then(res => res.json())
+        .catch(err => err);
+};
+
+export const updateCard = (id, body, token) => {
+    return fetch(`${cardsUrl}/${id}`, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json",
+            "X-Access-Token": token
+        },
+        body: body
+    })
+        .then(res => res.json())
+        .catch(err => err);
+};
+
+export const createCard = (body, token) => {
+    return fetch(`${cardsUrl}/register`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-Access-Token": token
+        },
+        body: body
+    })
+        .then(res => res.json())
+        .catch(err => err);
+};
+
+export const deleteCard = (id, token) => {
+    return fetch(`${cardsUrl}/${id}`, {
+        method: "DELETE",
+        headers: {
+            "Content-Type": "application/json",
+            "X-Access-Token": token
+        }
+    })
         .then(res => res.json())
         .catch(err => err);
 };

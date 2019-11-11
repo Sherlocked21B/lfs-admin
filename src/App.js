@@ -1,8 +1,15 @@
 import React, { useEffect } from "react";
 import { connect } from "react-redux";
 
-import { addMerchants, addMaxCount, setPage } from "./store/actions";
-import { fetchMerchants } from "./api/main";
+import {
+    addMerchants,
+    addMaxCount,
+    setPage,
+    addCards,
+    setCardPage,
+    addCardMaxCount
+} from "./store/actions";
+import { fetchMerchants, getCards } from "./api/main";
 
 import FullScreenDialog from "./components/Dialog";
 import ElevateAppBar from "./components/Appbar";
@@ -19,17 +26,33 @@ function MainApp({
     addMaxCount,
     merchants,
     page,
-    setPage
+    setPage,
+    cardPage,
+    setCardPage,
+    addCards,
+    maxCountCards,
+    addCardMaxCount
 }) {
     useEffect(() => {
-        fetchMerchants(page)
-            .then(data => {
-                if (!data.error && data.result && merchants.length === 0) {
-                    addMerchants(data.result);
-                    addMaxCount(data.count);
-                }
-            })
-            .catch(err => console.log(err));
+        if (maxCount === null)
+            fetchMerchants(page)
+                .then(data => {
+                    if (!data.error && data.result && merchants.length === 0) {
+                        addMerchants(data.result);
+                        addMaxCount(data.count);
+                    }
+                })
+                .catch(err => console.log(err));
+        if (maxCountCards === null && token !== null) {
+            getCards(cardPage, token)
+                .then(data => {
+                    if (!data.error && data.result) {
+                        addCards(data.result);
+                        addCardMaxCount(data.count);
+                    }
+                })
+                .catch(err => console.log(err));
+        }
     });
 
     useEffect(() => {
@@ -46,7 +69,27 @@ function MainApp({
                     .catch(err => console.log(err));
             }
         }
-    }, [page, maxCount, addMerchants, setPage]);
+        if (maxCountCards !== null && token !== null) {
+            if (maxCountCards - cardPage * 15 > 0) {
+                getCards(page + 1, token).then(data => {
+                    if (data.result && !data.error) {
+                        addCards(data.result);
+                        setCardPage(page + 1);
+                    }
+                });
+            }
+        }
+    }, [
+        page,
+        maxCount,
+        addMerchants,
+        setPage,
+        maxCountCards,
+        cardPage,
+        addCards,
+        setCardPage,
+        token
+    ]);
 
     return (
         <div className="App">
@@ -66,20 +109,24 @@ function MainApp({
     );
 }
 
-const mapDispatchToProps = dispatch => {
-    return {
-        addMerchants: merchants => dispatch(addMerchants(merchants)),
-        addMaxCount: maxCount => dispatch(addMaxCount(maxCount)),
-        setPage: page => dispatch(setPage(page))
-    };
+const mapDispatchToProps = {
+    addMerchants,
+    setPage,
+    addCards,
+    setCardPage,
+    addCardMaxCount,
+    addMaxCount
 };
 
 const mapStateToProps = state => {
     return {
-        token: state.token,
-        merchants: state.merchants,
-        maxCount: state.maxCount,
-        page: state.page
+        token: state.merchant.token,
+        merchants: state.merchant.merchants,
+        maxCount: state.merchant.maxCount,
+        page: state.merchant.page,
+        cardPage: state.card.page,
+        cards: state.card.cards,
+        maxCountCards: state.card.maxCount
     };
 };
 
