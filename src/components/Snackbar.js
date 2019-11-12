@@ -113,14 +113,14 @@ function CustomSnackBar({ type, message, isSnackBarOpen, toggleSnackBar }) {
 
 const mapStateToProps = state => {
     return {
-        message: state.message,
-        isSnackBarOpen: state.isSnackBarOpen
+        message: state.ui.message,
+        isSnackBarOpen: state.ui.isSnackBarOpen
     };
 };
 
 const mapDispatchToProps = dispatch => {
     return {
-        toggleSnackBar: merchants => dispatch(toggleSnackBar(merchants))
+        toggleSnackBar: value => dispatch(toggleSnackBar(value))
     };
 };
 
