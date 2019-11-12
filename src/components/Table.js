@@ -30,7 +30,8 @@ import {
   toggleEditDialog,
   setEdit,
   setMessage,
-  toggleSnackBar
+  toggleSnackBar,
+  setVariant
 } from "../store/actions";
 import { connect } from "react-redux";
 
@@ -41,7 +42,8 @@ function MerchantsTable({
   token,
   removeMerchant,
   setMessage,
-  toggleSnackBar
+  toggleSnackBar,
+  setVariant
 }) {
   const [confirm, setConfirm] = React.useState(false);
   const [deleteData, setDeleteData] = React.useState(null);
@@ -194,14 +196,15 @@ function MerchantsTable({
             onClick={() => {
               setDeleting(true);
               deleteMerchant({ token, id: deleteData._id }).then(data => {
-                console.log(data);
                 if (data.message) {
                   removeMerchant(deleteData._id);
                   handleClose();
                   setMessage(`Deleted ${deleteData.name} successfully!`);
+                  setVariant("success");
                   toggleSnackBar(true);
                 } else {
                   setMessage(`Failed to delete ${deleteData.name}!`);
+                  setVariant("error");
                   toggleSnackBar(true);
                 }
                 setDeleting(false);
@@ -242,14 +245,13 @@ const tableIcons = {
   ViewColumn: forwardRef((props, ref) => <ViewColumn {...props} ref={ref} />)
 };
 
-const mapDispatchToProps = dispatch => {
-  return {
-    removeMerchant: id => dispatch(removeMerchant(id)),
-    toggleEditDialog: status => dispatch(toggleEditDialog(status)),
-    setEdit: edit => dispatch(setEdit(edit)),
-    setMessage: value => dispatch(setMessage(value)),
-    toggleSnackBar: value => dispatch(toggleSnackBar(value))
-  };
+const mapDispatchToProps = {
+  removeMerchant,
+  toggleEditDialog,
+  setEdit,
+  setMessage,
+  toggleSnackBar,
+  setVariant
 };
 
 const mapStateToProps = state => {

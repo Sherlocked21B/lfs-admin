@@ -21,7 +21,8 @@ import {
   setMessage,
   toggleSnackBar,
   addCards,
-  removeCard
+  removeCard,
+  setVariant
 } from "../store/actions";
 import { connect } from "react-redux";
 import { createCard, deleteCard, updateCard } from "../api/main";
@@ -32,7 +33,8 @@ function Cards({
   addCards,
   removeCard,
   setMessage,
-  toggleSnackBar
+  toggleSnackBar,
+  setVariant
 }) {
   const columns = [
     { title: "Card Id", field: "card" },
@@ -58,9 +60,11 @@ function Cards({
           if (data.message) {
             addCards([data.card]);
             setMessage(`Card ${data.card.card} created successfully!`);
+            setVariant("success");
             toggleSnackBar(true);
           } else {
-            setMessage(`Failed creating card ${newData.card}!`);
+            setVariant("error");
+            setMessage(`Failed creating card ${newData.card || ""}!`);
             toggleSnackBar(true);
           }
           resolve();
@@ -68,28 +72,42 @@ function Cards({
       }),
     onRowUpdate: (newData, oldData) =>
       new Promise(resolve => {
-        updateCard(oldData._id, JSON.stringify(newData), token).then(data => {
-          if (!data.error && data.message) {
-            console.log(data);
-            removeCard(oldData._id);
-            addCards([data.card]);
-            setMessage(`Card ${data.card.card} updated successfully!`);
-            toggleSnackBar(true);
-          } else {
-            setMessage(`Failed updaing card ${newData.card}!`);
-            toggleSnackBar(true);
-          }
-          resolve();
-        });
+        const cardData = {};
+        if (newData.user !== oldData.user) cardData.user = newData.user;
+        if (newData.card !== oldData.card) cardData.card = newData.card;
+        if (Object.keys(cardData).length > 0) {
+          updateCard(oldData._id, JSON.stringify(cardData), token).then(
+            data => {
+              if (!data.error && data.message) {
+                removeCard(oldData._id);
+                addCards([data.card]);
+                setMessage(`Card ${data.card.card} updated successfully!`);
+                setVariant("info");
+                toggleSnackBar(true);
+              } else {
+                setVariant("error");
+                setMessage(`Failed updting card ${newData.card}!`);
+                toggleSnackBar(true);
+              }
+            }
+          );
+        } else {
+          setVariant("error");
+          setMessage(`No changes made to ${oldData.card}. Aborted!`);
+          toggleSnackBar(true);
+        }
+        resolve();
       }),
     onRowDelete: oldData =>
       new Promise(resolve => {
         deleteCard(oldData._id, token).then(data => {
           if (!data.error && data.message) {
             removeCard(oldData._id);
+            setVariant("success");
             setMessage(`Card ${oldData.card} deleted successfully!`);
             toggleSnackBar(true);
           } else {
+            setVariant("error");
             setMessage(`Failed deleting card ${oldData.card}!`);
             toggleSnackBar(true);
           }
@@ -119,7 +137,8 @@ const mapDispatchToProps = {
   addCards,
   setMessage,
   toggleSnackBar,
-  removeCard
+  removeCard,
+  setVariant
 };
 
 const mapStateToProps = state => {

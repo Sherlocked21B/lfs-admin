@@ -54,7 +54,6 @@ function EditMerchantsDialog({
 
     useEffect(() => {
         if (Object.keys(edit).length > 0 && edit.constructor === Object) {
-            console.log(edit);
             setId(edit._id);
             setName(edit.name);
             setEmail(edit.email);

@@ -103,7 +103,6 @@ function AppDrawer({ toggleAddDialog, addToken }) {
 const mapDispatchToProps = dispatch => {
     return {
         addToken: token => dispatch(addToken(token)),
-
         toggleAddDialog: status => dispatch(toggleAddDialog(status))
     };
 };
