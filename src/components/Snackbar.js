@@ -87,7 +87,7 @@ function CustomSnackBar({ type, message, isSnackBarOpen, toggleSnackBar }) {
             return;
         }
 
-        toggleSnackBar(false);
+        toggleSnackBar({ open: false });
     };
 
     return (
@@ -98,7 +98,7 @@ function CustomSnackBar({ type, message, isSnackBarOpen, toggleSnackBar }) {
                     horizontal: "left"
                 }}
                 open={isSnackBarOpen}
-                autoHideDuration={3000}
+                autoHideDuration={6000}
                 onClose={handleClose}
             >
                 <SnackbarContentWrapper

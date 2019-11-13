@@ -11,8 +11,9 @@ import CloseIcon from "@material-ui/icons/Close";
 import Slide from "@material-ui/core/Slide";
 import InputWithIcon from "./Input";
 
-import { toggleEditDialog } from "../store/actions";
+import { toggleEditDialog, toggleSnackBar } from "../store/actions";
 import { connect } from "react-redux";
+import { addPhotos, updatePhotos, deletePhotos } from "../api/main";
 
 const useStyles = makeStyles(theme => ({
     appBar: {
@@ -32,7 +33,8 @@ function EditMerchantsDialog({
     isEditDialogOpen,
     toggleEditDialog,
     edit,
-    token
+    token,
+    toggleSnackBar
 }) {
     const classes = useStyles();
     const handleClose = () => {
@@ -51,6 +53,7 @@ function EditMerchantsDialog({
     const [description, setDescription] = useState("");
     const [media, setMedia] = useState(null);
     const [contact, setContact] = useState("");
+    const [upload, setUpload] = useState([]);
 
     useEffect(() => {
         if (Object.keys(edit).length > 0 && edit.constructor === Object) {
@@ -64,10 +67,63 @@ function EditMerchantsDialog({
             });
             setCategory(edit.category);
             setDescription(edit.description);
-            setMedia(edit.media !== undefined ? edit.media.src : null);
+            setMedia(edit.media !== undefined ? edit.media : {});
             setContact(edit.contact);
         }
     }, [edit]);
+
+    useEffect(() => {
+        if (upload.length > 0) {
+            if (Object.keys(media).length === 0) {
+                console.log(upload);
+                const form = new FormData();
+                for (let i = 0; i < upload.length; i++) {
+                    form.append("avatar", upload[i]);
+                }
+                addPhotos({ id, token, body: form }).then(data => {
+                    if (data.media && data.media.src.length > 0) {
+                        setMedia(data.media);
+                        toggleSnackBar({
+                            open: true,
+                            message: `Images uploaded successfully! Count: ${upload.length}`,
+                            variant: "info"
+                        });
+                    } else {
+                        toggleSnackBar({
+                            open: true,
+                            message: `Failed uploading ${upload.length} images!`,
+                            variant: "error"
+                        });
+                    }
+                    setUpload([]);
+                });
+            } else if (Object.keys(media).length > 0) {
+                const form = new FormData();
+                for (let i = 0; i < upload.length; i++) {
+                    form.append("avatar", upload[i]);
+                }
+                updatePhotos({ id, token, body: form }).then(data => {
+                    console.log(data);
+                    if (data.media) {
+                        console.log(data.media);
+                        setMedia(data.media);
+                        toggleSnackBar({
+                            open: true,
+                            message: `Images uploaded successfully!`,
+                            variant: "info"
+                        });
+                    } else {
+                        toggleSnackBar({
+                            open: true,
+                            message: `Failed uploading ${upload.length} images!`,
+                            variant: "error"
+                        });
+                    }
+                    setUpload([]);
+                });
+            }
+        }
+    }, [upload]);
 
     const handleSave = () => {
         const data = Object.freeze({
@@ -83,6 +139,14 @@ function EditMerchantsDialog({
         // createMerchant({ token, body: JSON.stringify(data) }).then(res => {
         //     console.log(res);
         // });
+    };
+
+    const handleDeleteImage = name => {
+        deletePhotos({
+            id,
+            token,
+            name
+        }).then(res => console.log(res));
     };
 
     return (
@@ -127,8 +191,10 @@ function EditMerchantsDialog({
                         setDescription={setDescription}
                         contact={contact}
                         setContact={setContact}
-                        setMedia={setMedia}
+                        setMedia={setUpload}
                         id={id}
+                        media={media}
+                        handleDeleteImage={handleDeleteImage}
                     />
                 </List>
             </Dialog>
@@ -136,10 +202,9 @@ function EditMerchantsDialog({
     );
 }
 
-const mapDispatchToProps = dispatch => {
-    return {
-        toggleEditDialog: status => dispatch(toggleEditDialog(status))
-    };
+const mapDispatchToProps = {
+    toggleEditDialog,
+    toggleSnackBar
 };
 
 const mapStateToProps = state => {
