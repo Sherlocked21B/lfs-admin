@@ -1,15 +1,13 @@
 import React from "react";
 import { connect } from "react-redux";
-
 import { addMerchants } from "./store/actions";
-
 import InputAdornments from "./components/Login";
+import Search from "./components/Search";
 
 function MainApp({ token }) {
-    // localStorage.removeItem("token");
     return (
         <div className="App">
-            {token === null ? <InputAdornments /> : <>Hello World!</>}
+            {token === null ? <InputAdornments /> : <Search />}
         </div>
     );
 }
