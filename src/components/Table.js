@@ -16,14 +16,18 @@ function TableCard({ visits }) {
                 {
                     title: "Timestamp",
                     field: "timestamp",
-                    render: rowData => (
-                        <Chip label={Date(rowData.timestamp).normalize()} />
-                    )
+                    render: rowData => {
+                        return (
+                            <Chip
+                                label={new Date(rowData.timestamp).toUTCString()}
+                            />
+                        );
+                    }
                 }
             ]}
             data={
                 visits !== null
-                    ? visits.timestamp.map(each => {
+                    ? visits.map(each => {
                           return { timestamp: each };
                       })
                     : []

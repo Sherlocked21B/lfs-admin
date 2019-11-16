@@ -17,13 +17,10 @@ function rootReducer(state = initialState, action) {
                 result: action.payload
             });
         case actionMaps.SET_VISITS:
-            if (state.visits === null)
-                return Object.assign({}, state, {
-                    visits: action.payload
-                });
             return Object.assign({}, state, {
-                visits: state.visits.concat(action.payload)
+                visits: action.payload
             });
+
         default:
             return state;
     }

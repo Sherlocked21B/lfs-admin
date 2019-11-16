@@ -27,7 +27,10 @@ function SearchBar({ token, setResult, setVisits }) {
                         setResult(data.user);
                         getVisit(data.user._id, token)
                             .then(data => {
-                                if (data.result) setVisits(data.result[0]);
+                                if (data.result.length > 0)
+                                    setVisits(data.result[0].timestamp);
+                                else if (data.result.length === 0)
+                                    setVisits([]);
                                 setSearching(false);
                             })
                             .catch(err => {

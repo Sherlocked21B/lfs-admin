@@ -3,6 +3,7 @@ import { connect } from "react-redux";
 import InputAdornments from "./components/Login";
 import Search from "./components/Search";
 import Result from "./components/Result";
+import ButtonAppBar from "./components/Appbar";
 
 function MainApp({ token, result }) {
     return (
@@ -11,6 +12,7 @@ function MainApp({ token, result }) {
                 <InputAdornments />
             ) : (
                 <>
+                <ButtonAppBar/>
                     <Search />
                     {result ? <Result /> : null}
                 </>

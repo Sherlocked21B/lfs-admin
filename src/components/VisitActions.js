@@ -1,10 +1,13 @@
-import React from "react";
+import React, { useState } from "react";
 import { CircularProgress, Button } from "@material-ui/core";
 import { connect } from "react-redux";
 import { createVisit, updateVisit } from "../api/main";
+import { setVisits } from "../store/actions";
 
-function Visit({ visits, result, token }) {
+function Visit({ visits, result, token, setVisits }) {
+    const [isActive, setIsActive] = useState(false);
     const createFirstVisit = () => {
+        setIsActive(true);
         createVisit(
             JSON.stringify({
                 user: result._id,
@@ -14,12 +17,17 @@ function Visit({ visits, result, token }) {
         )
             .then(data => {
                 if (data.message && !data.error)
-                    console.log(data.visit.timestamp);
+                    setVisits(data.visit.timestamp);
+                setIsActive(false);
             })
-            .catch(err => console.log(err));
+            .catch(err => {
+                setIsActive(false);
+                console.log(err);
+            });
     };
 
     const markVisit = () => {
+        setIsActive(true);
         updateVisit(
             JSON.stringify({
                 user: result._id,
@@ -29,21 +37,31 @@ function Visit({ visits, result, token }) {
         )
             .then(data => {
                 if (data.message && !data.error) {
-                    console.log(data.visit.timestamp);
+                    setVisits(data.visit.timestamp);
                 }
+                setIsActive(false);
             })
-            .catch(err => console.log(err));
+            .catch(err => {
+                setIsActive(false);
+                console.log(err);
+            });
     };
     return visits !== null ? (
         visits.length === 0 ? (
-            <Button
-                variant="contained"
-                size="small"
-                color="primary"
-                onClick={createFirstVisit}
-            >
-                Create Visit
-            </Button>
+            isActive ? (
+                <CircularProgress />
+            ) : (
+                <Button
+                    variant="contained"
+                    size="small"
+                    color="primary"
+                    onClick={createFirstVisit}
+                >
+                    Create Visit
+                </Button>
+            )
+        ) : isActive ? (
+            <CircularProgress />
         ) : (
             <Button
                 variant="contained"
@@ -59,6 +77,10 @@ function Visit({ visits, result, token }) {
     );
 }
 
+const mapDispatchToProps = {
+    setVisits
+};
+
 const mapStateToProps = state => {
     return {
         result: state.result,
@@ -66,5 +88,5 @@ const mapStateToProps = state => {
         token: state.token
     };
 };
-const VisitActions = connect(mapStateToProps, null)(Visit);
+const VisitActions = connect(mapStateToProps, mapDispatchToProps)(Visit);
 export default VisitActions;
