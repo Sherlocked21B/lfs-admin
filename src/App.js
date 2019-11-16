@@ -1,27 +1,30 @@
 import React from "react";
 import { connect } from "react-redux";
-import { addMerchants } from "./store/actions";
 import InputAdornments from "./components/Login";
 import Search from "./components/Search";
+import Result from "./components/Result";
 
-function MainApp({ token }) {
+function MainApp({ token, result }) {
     return (
         <div className="App">
-            {token === null ? <InputAdornments /> : <Search />}
+            {token === null ? (
+                <InputAdornments />
+            ) : (
+                <>
+                    <Search />
+                    {result ? <Result /> : null}
+                </>
+            )}
         </div>
     );
 }
 
-const mapDispatchToProps = {
-    addMerchants
-};
-
 const mapStateToProps = state => {
     return {
-        token: state.merchant.token
+        token: state.token,
+        result: state.result
     };
 };
-
-const App = connect(mapStateToProps, mapDispatchToProps)(MainApp);
+const App = connect(mapStateToProps, null)(MainApp);
 
 export default App;

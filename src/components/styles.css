@@ -1,4 +1,22 @@
-.MuiAppBar-root{
-  height: 50px;
-  justify-content: center;
+.card__user {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.paper__user {
+    min-width: 280px;
+    padding: 20px;
+}
+
+.rebecca {
+    color: rebeccapurple;
+}
+
+.info__row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px 10px;
 }
