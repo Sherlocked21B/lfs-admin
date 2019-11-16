@@ -7,7 +7,7 @@ import FormControl from "@material-ui/core/FormControl";
 import { Button, Checkbox, FormControlLabel } from "@material-ui/core";
 
 import { verifyMerchant } from "../api/main";
-import { addToken } from "../store/actions";
+import { addToken, setMerchant } from "../store/actions";
 import { connect } from "react-redux";
 
 const useStyles = makeStyles(theme => ({
@@ -31,7 +31,7 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-function Login({ addToken }) {
+function Login({ addToken, setMerchant }) {
     const classes = useStyles();
     const [password, setPassword] = React.useState("");
     const [remember, setRemember] = React.useState(true);
@@ -44,7 +44,7 @@ function Login({ addToken }) {
         if (password.length > 10) {
             verifyMerchant(password).then(data => {
                 if (!data.error) {
-                    console.log(data.result);
+                    setMerchant(data.result);
                     if (remember) localStorage.setItem("token", password);
                     addToken(password);
                 }
@@ -92,10 +92,9 @@ function Login({ addToken }) {
     );
 }
 
-const mapDispatchToProps = dispatch => {
-    return {
-        addToken: token => dispatch(addToken(token))
-    };
+const mapDispatchToProps = {
+    addToken,
+    setMerchant
 };
 
 const InputAdornments = connect(null, mapDispatchToProps)(Login);

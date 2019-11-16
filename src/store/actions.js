@@ -11,3 +11,7 @@ export function setResult(payload) {
 export function setVisits(payload) {
     return Object.freeze({ type: actionMaps.SET_VISITS, payload });
 }
+
+export function setMerchant(payload) {
+    return Object.freeze({ type: actionMaps.SET_MERCHANT, payload });
+}

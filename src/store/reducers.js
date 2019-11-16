@@ -3,7 +3,8 @@ import actionMaps from "./mappers";
 const initialState = {
     token: localStorage.getItem("token") || null,
     result: null,
-    visits: null
+    visits: null,
+    merchant: null
 };
 
 function rootReducer(state = initialState, action) {
@@ -19,6 +20,10 @@ function rootReducer(state = initialState, action) {
         case actionMaps.SET_VISITS:
             return Object.assign({}, state, {
                 visits: action.payload
+            });
+        case actionMaps.SET_MERCHANT:
+            return Object.assign({}, state, {
+                merchant: action.payload
             });
 
         default:
