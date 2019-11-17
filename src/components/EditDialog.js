@@ -13,7 +13,13 @@ import InputWithIcon from "./Input";
 
 import { toggleEditDialog, toggleSnackBar } from "../store/actions";
 import { connect } from "react-redux";
-import { addPhotos, updatePhotos, deletePhotos } from "../api/main";
+import {
+    addPhotos,
+    updatePhotos,
+    deletePhotos,
+    updateMerchants
+} from "../api/main";
+import { CircularProgress } from "@material-ui/core";
 
 const useStyles = makeStyles(theme => ({
     appBar: {
@@ -40,6 +46,7 @@ function EditMerchantsDialog({
     const handleClose = () => {
         toggleEditDialog(false);
     };
+    const [isActive, setIsActive] = useState(false);
 
     const [id, setId] = useState(null);
     const [name, setName] = useState("");
@@ -126,6 +133,7 @@ function EditMerchantsDialog({
     }, [upload]);
 
     const handleSave = () => {
+        setIsActive(true);
         const data = Object.freeze({
             name: name,
             email: email || "",
@@ -136,9 +144,25 @@ function EditMerchantsDialog({
             contact: contact
         });
         console.log(data);
-        // createMerchant({ token, body: JSON.stringify(data) }).then(res => {
-        //     console.log(res);
-        // });
+        updateMerchants({ id, token, body: JSON.stringify(data) })
+            .then(res => {
+                console.log(res);
+                setIsActive(false);
+                toggleSnackBar({
+                    open: true,
+                    variant: "success",
+                    message: "Merchant updated successfully!"
+                });
+            })
+            .catch(err => {
+                toggleSnackBar({
+                    open: true,
+                    variant: "error",
+                    message: "Failed updating merchant!"
+                });
+                console.error(err);
+                setIsActive(false);
+            });
     };
 
     const handleDeleteImage = name => {
@@ -170,9 +194,17 @@ function EditMerchantsDialog({
                         <Typography variant="h6" className={classes.title}>
                             {edit.name}
                         </Typography>
-                        <Button autoFocus color="inherit" onClick={handleSave}>
-                            save
-                        </Button>
+                        {isActive ? (
+                            <CircularProgress color="secondary" />
+                        ) : (
+                            <Button
+                                autoFocus
+                                color="inherit"
+                                onClick={handleSave}
+                            >
+                                save
+                            </Button>
+                        )}
                     </Toolbar>
                 </AppBar>
                 <List>
