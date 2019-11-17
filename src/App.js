@@ -7,6 +7,7 @@ import ButtonAppBar from "./components/Appbar";
 import { verifyMerchant } from "./api/main";
 import { setMerchant } from "./store/actions";
 import { Chip } from "@material-ui/core";
+import CustomizedSnackbars from "./components/Snackbar";
 
 function MainApp({ token, result, merchant, setMerchant }) {
     useEffect(() => {
@@ -26,12 +27,12 @@ function MainApp({ token, result, merchant, setMerchant }) {
             ) : (
                 <>
                     <ButtonAppBar />
-                    <Chip label={merchant ? merchant.name : merchant} />
-
+                    {merchant ? <Chip label={merchant.name} style={{margin: "10px"}}/> : null}
                     <Search />
                     {result ? <Result /> : null}
                 </>
             )}
+            <CustomizedSnackbars />
         </div>
     );
 }

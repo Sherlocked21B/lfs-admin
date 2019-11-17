@@ -4,7 +4,10 @@ const initialState = {
     token: localStorage.getItem("token") || null,
     result: null,
     visits: null,
-    merchant: null
+    merchant: null,
+    message: null,
+    variant: null,
+    isSnackBarOpen: false
 };
 
 function rootReducer(state = initialState, action) {
@@ -24,6 +27,12 @@ function rootReducer(state = initialState, action) {
         case actionMaps.SET_MERCHANT:
             return Object.assign({}, state, {
                 merchant: action.payload
+            });
+        case actionMaps.SET_SNACKBAR:
+            return Object.assign({}, state, {
+                isSnackBarOpen: action.payload.isSnackBarOpen,
+                message: action.payload.message,
+                variant: action.payload.variant
             });
 
         default:

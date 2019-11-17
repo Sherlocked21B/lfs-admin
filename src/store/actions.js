@@ -15,3 +15,7 @@ export function setVisits(payload) {
 export function setMerchant(payload) {
     return Object.freeze({ type: actionMaps.SET_MERCHANT, payload });
 }
+
+export function setSnackbar(payload) {
+    return Object.freeze({ type: actionMaps.SET_SNACKBAR, payload });
+}

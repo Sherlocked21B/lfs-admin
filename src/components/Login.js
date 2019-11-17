@@ -4,10 +4,15 @@ import { makeStyles } from "@material-ui/core/styles";
 import Input from "@material-ui/core/Input";
 import InputLabel from "@material-ui/core/InputLabel";
 import FormControl from "@material-ui/core/FormControl";
-import { Button, Checkbox, FormControlLabel } from "@material-ui/core";
+import {
+    Button,
+    Checkbox,
+    FormControlLabel,
+    CircularProgress
+} from "@material-ui/core";
 
 import { verifyMerchant } from "../api/main";
-import { addToken, setMerchant } from "../store/actions";
+import { addToken, setMerchant, setSnackbar } from "../store/actions";
 import { connect } from "react-redux";
 
 const useStyles = makeStyles(theme => ({
@@ -31,10 +36,11 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-function Login({ addToken, setMerchant }) {
+function Login({ addToken, setMerchant, setSnackbar }) {
     const classes = useStyles();
     const [password, setPassword] = React.useState("");
     const [remember, setRemember] = React.useState(true);
+    const [active, setActive] = React.useState(false);
 
     const handleChange = event => {
         setPassword(event.target.value);
@@ -42,13 +48,31 @@ function Login({ addToken, setMerchant }) {
 
     const handleLogin = () => {
         if (password.length > 10) {
-            verifyMerchant(password).then(data => {
-                if (!data.error) {
-                    setMerchant(data.result);
-                    if (remember) localStorage.setItem("token", password);
-                    addToken(password);
-                }
-            });
+            setActive(true);
+            verifyMerchant(password)
+                .then(data => {
+                    if (!data.error) {
+                        setMerchant(data.result);
+                        if (remember) localStorage.setItem("token", password);
+                        addToken(password);
+                    } else {
+                        setSnackbar({
+                            isSnackBarOpen: true,
+                            message: "Error verifying merchant!",
+                            variant: "error"
+                        });
+                    }
+                    setActive(false);
+                })
+                .catch(err => {
+                    console.error(err);
+                    setActive(false);
+                    setSnackbar({
+                        isSnackBarOpen: true,
+                        message: "Something wrong happened!",
+                        variant: "error"
+                    });
+                });
         }
     };
 
@@ -68,13 +92,17 @@ function Login({ addToken, setMerchant }) {
                         onChange={handleChange}
                     />
                 </FormControl>
-                <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={handleLogin}
-                >
-                    Proceed
-                </Button>
+                {active ? (
+                    <CircularProgress />
+                ) : (
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={handleLogin}
+                    >
+                        Proceed
+                    </Button>
+                )}
             </div>
             <FormControlLabel
                 control={
@@ -94,7 +122,8 @@ function Login({ addToken, setMerchant }) {
 
 const mapDispatchToProps = {
     addToken,
-    setMerchant
+    setMerchant,
+    setSnackbar
 };
 
 const InputAdornments = connect(null, mapDispatchToProps)(Login);
