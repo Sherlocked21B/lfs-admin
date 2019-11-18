@@ -111,7 +111,9 @@ function MerchantsTable({
             field: "url",
             render: rowData => (
                 <>
-                    {rowData.media === undefined || rowData.media === null ? (
+                    {rowData.media === undefined ||
+                    rowData.media === null ||
+                    rowData.media.src === undefined ? (
                         <p>N/A</p>
                     ) : (
                         rowData.media.src.map((each, index) => (

@@ -18,6 +18,7 @@ import {
     addMerchants
 } from "../store/actions";
 import { connect } from "react-redux";
+import { CircularProgress } from "@material-ui/core";
 
 const useStyles = makeStyles(theme => ({
     appBar: {
@@ -56,7 +57,10 @@ function AddDialog({
     const [description, setDescription] = useState("");
     const [contact, setContact] = useState("");
 
+    const [isActive, setIsActive] = useState(false);
+
     const handleSave = () => {
+        setIsActive(true);
         const data = Object.freeze({
             name: name,
             email: email || "",
@@ -66,25 +70,34 @@ function AddDialog({
             // description: description ,
             contact: contact
         });
-        createMerchant({ token, body: JSON.stringify(data) }).then(res => {
-            if (res.message) {
-                if (res.merchant) {
-                    addMerchants([{ ...res.merchant, key: res.merchant._id }]);
+        createMerchant({ token, body: JSON.stringify(data) })
+            .then(res => {
+                console.log(res);
+                if (res.message) {
+                    if (res.merchant) {
+                        addMerchants([
+                            { ...res.merchant, key: res.merchant._id }
+                        ]);
+                    }
+                    toggleSnackBar({
+                        open: true,
+                        message: "Merchant created successfully!",
+                        variant: "success"
+                    });
+                    handleClose();
+                } else {
+                    toggleSnackBar({
+                        open: true,
+                        message: "Error creating merchant!",
+                        variant: "error"
+                    });
                 }
-                toggleSnackBar({
-                    open: true,
-                    message: "Merchant created successfully!",
-                    variant: "success"
-                });
-                handleClose();
-            } else {
-                toggleSnackBar({
-                    open: true,
-                    message: "Error creating merchant!",
-                    variant: "error"
-                });
-            }
-        });
+                setIsActive(false);
+            })
+            .catch(err => {
+                console.error(err);
+                setIsActive(false);
+            });
     };
 
     return (
@@ -108,9 +121,17 @@ function AddDialog({
                         <Typography variant="h6" className={classes.title}>
                             Add Merchants
                         </Typography>
-                        <Button autoFocus color="inherit" onClick={handleSave}>
-                            save
-                        </Button>
+                        {isActive ? (
+                            <CircularProgress color="secondary" />
+                        ) : (
+                            <Button
+                                autoFocus
+                                color="inherit"
+                                onClick={handleSave}
+                            >
+                                Save
+                            </Button>
+                        )}
                     </Toolbar>
                 </AppBar>
                 <List>

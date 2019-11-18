@@ -1,6 +1,6 @@
 import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import { Button, IconButton } from "@material-ui/core";
+import { Button, IconButton, CircularProgress } from "@material-ui/core";
 import InputField from "./Inputfield";
 import DeleteIcon from "@material-ui/icons/Delete";
 
@@ -50,7 +50,8 @@ export default function InputWithIcon({
     setLocation,
     setMedia,
     media,
-    handleDeleteImage
+    handleDeleteImage,
+    isUploading
 }) {
     const classes = useStyles();
 
@@ -134,14 +135,18 @@ export default function InputWithIcon({
                                 }}
                             />
                             <label htmlFor="raised-button-file">
-                                <Button
-                                    variant="contained"
-                                    color="secondary"
-                                    component="span"
-                                    className={classes.input}
-                                >
-                                    Upload Images
-                                </Button>
+                                {isUploading ? (
+                                    <CircularProgress />
+                                ) : (
+                                    <Button
+                                        variant="contained"
+                                        color="secondary"
+                                        component="span"
+                                        className={classes.input}
+                                    >
+                                        Upload Images
+                                    </Button>
+                                )}
                             </label>
                             <div
                                 style={{

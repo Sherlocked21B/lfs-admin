@@ -11,7 +11,11 @@ import CloseIcon from "@material-ui/icons/Close";
 import Slide from "@material-ui/core/Slide";
 import InputWithIcon from "./Input";
 
-import { toggleEditDialog, toggleSnackBar } from "../store/actions";
+import {
+    toggleEditDialog,
+    toggleSnackBar,
+    editMerchant
+} from "../store/actions";
 import { connect } from "react-redux";
 import {
     addPhotos,
@@ -40,13 +44,15 @@ function EditMerchantsDialog({
     toggleEditDialog,
     edit,
     token,
-    toggleSnackBar
+    toggleSnackBar,
+    editMerchant
 }) {
     const classes = useStyles();
     const handleClose = () => {
         toggleEditDialog(false);
     };
     const [isActive, setIsActive] = useState(false);
+    const [isUploading, setIsUploading] = useState(false);
 
     const [id, setId] = useState(null);
     const [name, setName] = useState("");
@@ -83,51 +89,75 @@ function EditMerchantsDialog({
         if (upload.length > 0) {
             if (Object.keys(media).length === 0) {
                 console.log(upload);
+                setIsUploading(true);
                 const form = new FormData();
                 for (let i = 0; i < upload.length; i++) {
                     form.append("avatar", upload[i]);
                 }
-                addPhotos({ id, token, body: form }).then(data => {
-                    if (data.media && data.media.src.length > 0) {
-                        setMedia(data.media);
-                        toggleSnackBar({
-                            open: true,
-                            message: `Images uploaded successfully! Count: ${upload.length}`,
-                            variant: "info"
-                        });
-                    } else {
-                        toggleSnackBar({
-                            open: true,
-                            message: `Failed uploading ${upload.length} images!`,
-                            variant: "error"
-                        });
-                    }
-                    setUpload([]);
-                });
+                addPhotos({ id, token, body: form })
+                    .then(data => {
+                        if (data.media && data.media.src.length > 0) {
+                            setMedia(data.media);
+                            editMerchant({
+                                ...edit,
+                                media: data.media,
+                                _id: id
+                            });
+                            toggleSnackBar({
+                                open: true,
+                                message: `Images uploaded successfully! Count: ${upload.length}`,
+                                variant: "info"
+                            });
+                        } else {
+                            toggleSnackBar({
+                                open: true,
+                                message: `Failed uploading ${upload.length} images!`,
+                                variant: "error"
+                            });
+                        }
+                        setUpload([]);
+                        setIsUploading(false);
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        setIsUploading(false);
+                    });
             } else if (Object.keys(media).length > 0) {
+                setIsUploading(true);
                 const form = new FormData();
                 for (let i = 0; i < upload.length; i++) {
                     form.append("avatar", upload[i]);
                 }
-                updatePhotos({ id, token, body: form }).then(data => {
-                    console.log(data);
-                    if (data.media) {
-                        console.log(data.media);
-                        setMedia(data.media);
-                        toggleSnackBar({
-                            open: true,
-                            message: `Images uploaded successfully!`,
-                            variant: "info"
-                        });
-                    } else {
-                        toggleSnackBar({
-                            open: true,
-                            message: `Failed uploading ${upload.length} images!`,
-                            variant: "error"
-                        });
-                    }
-                    setUpload([]);
-                });
+                updatePhotos({ id, token, body: form })
+                    .then(data => {
+                        console.log(data);
+                        if (data.media) {
+                            console.log(data.media);
+                            setMedia(data.media);
+                            editMerchant({
+                                ...edit,
+                                media: data.media,
+                                _id: id
+                            });
+                            toggleSnackBar({
+                                open: true,
+                                message: `Images uploaded successfully!`,
+                                variant: "info"
+                            });
+                        } else {
+                            toggleSnackBar({
+                                open: true,
+                                message: `Failed uploading ${upload.length} images!`,
+                                variant: "error"
+                            });
+                        }
+                        setUpload([]);
+                        setIsUploading(false);
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        setIsUploading(false);
+                    });
             }
         }
     }, [upload]);
@@ -148,6 +178,7 @@ function EditMerchantsDialog({
             .then(res => {
                 console.log(res);
                 setIsActive(false);
+                editMerchant({ ...data, media: media || null, _id: id });
                 toggleSnackBar({
                     open: true,
                     variant: "success",
@@ -227,6 +258,7 @@ function EditMerchantsDialog({
                         id={id}
                         media={media}
                         handleDeleteImage={handleDeleteImage}
+                        isUploading={isUploading}
                     />
                 </List>
             </Dialog>
@@ -236,7 +268,8 @@ function EditMerchantsDialog({
 
 const mapDispatchToProps = {
     toggleEditDialog,
-    toggleSnackBar
+    toggleSnackBar,
+    editMerchant
 };
 
 const mapStateToProps = state => {

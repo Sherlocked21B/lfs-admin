@@ -37,6 +37,16 @@ function merchantsReducer(state = initialState, action) {
                 )
             });
 
+        case actionMaps.EDIT_MERCHANT:
+            return Object.assign({}, state, {
+                merchants: [
+                    ...state.merchants.filter(
+                        each => each._id !== action.payload._id
+                    ),
+                    action.payload
+                ]
+            });
+
         case actionMaps.SET_MAXCOUNT:
             return Object.assign({}, state, {
                 maxCount: action.payload
