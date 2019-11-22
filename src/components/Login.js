@@ -51,10 +51,17 @@ function Login({ addToken, setMerchant, setSnackbar }) {
             setActive(true);
             verifyMerchant(password)
                 .then(data => {
-                    if (!data.error) {
+                    console.log(data);
+                    if (!data.error && data.result !== null) {
                         setMerchant(data.result);
                         if (remember) localStorage.setItem("token", password);
                         addToken(password);
+                    } else if (data.result === null) {
+                        setSnackbar({
+                            isSnackBarOpen: true,
+                            message: "No merchant found!",
+                            variant: "error"
+                        });
                     } else {
                         setSnackbar({
                             isSnackBarOpen: true,

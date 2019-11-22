@@ -5,7 +5,7 @@ import Search from "./components/Search";
 import Result from "./components/Result";
 import ButtonAppBar from "./components/Appbar";
 import { verifyMerchant } from "./api/main";
-import { setMerchant } from "./store/actions";
+import { setMerchant, addToken } from "./store/actions";
 import { Chip } from "@material-ui/core";
 import CustomizedSnackbars from "./components/Snackbar";
 
@@ -13,8 +13,10 @@ function MainApp({ token, result, merchant, setMerchant }) {
     useEffect(() => {
         if (merchant === null) {
             verifyMerchant(token).then(data => {
-                if (!data.error) {
+                if (!data.error && data.result !== null) {
                     setMerchant(data.result);
+                } else {
+                    addToken(null);
                 }
             });
         }
@@ -27,7 +29,12 @@ function MainApp({ token, result, merchant, setMerchant }) {
             ) : (
                 <>
                     <ButtonAppBar />
-                    {merchant ? <Chip label={merchant.name} style={{margin: "10px"}}/> : null}
+                    {merchant ? (
+                        <Chip
+                            label={merchant.name}
+                            style={{ margin: "10px" }}
+                        />
+                    ) : null}
                     <Search />
                     {result ? <Result /> : null}
                 </>

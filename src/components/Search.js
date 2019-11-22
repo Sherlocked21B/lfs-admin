@@ -3,11 +3,11 @@ import { TextField, IconButton, CircularProgress } from "@material-ui/core";
 import SearchIcon from "@material-ui/icons/Search";
 import { searchCard, getVisit } from "../api/main";
 import { connect } from "react-redux";
-import { setResult, setVisits } from "../store/actions";
+import { setResult, setVisits, setSnackbar } from "../store/actions";
 
 const regex = new RegExp(/\d{6}\w{1}/);
 
-function SearchBar({ token, setResult, setVisits }) {
+function SearchBar({ token, setResult, setVisits, setSnackbar }) {
     const [error, setError] = useState(false);
     const [value, setValue] = useState("");
     const handleChange = e => {
@@ -23,13 +23,14 @@ function SearchBar({ token, setResult, setVisits }) {
             setSearching(true);
             searchCard(value)
                 .then(data => {
-                    if (!data.error) {
+                    if (!data.error && data.user !== null) {
                         setResult(data.user);
                         getVisit(data.user._id, token)
-                            .then(data => {
-                                if (data.result.length > 0)
-                                    setVisits(data.result[0].timestamp);
-                                else if (data.result.length === 0)
+                            .then(dataVisit => {
+                                console.log("Visit", dataVisit);
+                                if (dataVisit.result.length > 0)
+                                    setVisits(dataVisit.result[0].timestamp);
+                                else if (dataVisit.result.length === 0)
                                     setVisits([]);
                                 setSearching(false);
                             })
@@ -37,9 +38,16 @@ function SearchBar({ token, setResult, setVisits }) {
                                 setSearching(false);
                                 console.error(err);
                             });
-                    } else {
-                        setSearching(false);
+                    } else if (data.error === "Visits not found!") {
+                        setVisits([]);
+                    } else if (data.user === null) {
+                        setSnackbar({
+                            isSnackBarOpen: true,
+                            message: "User not found!",
+                            variant: "error"
+                        });
                     }
+                    setSearching(false);
                 })
                 .catch(err => {
                     setSearching(false);
@@ -94,7 +102,8 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = {
     setResult,
-    setVisits
+    setVisits,
+    setSnackbar
 };
 const Search = connect(mapStateToProps, mapDispatchToProps)(SearchBar);
 
