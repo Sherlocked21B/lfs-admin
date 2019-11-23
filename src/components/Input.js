@@ -43,8 +43,8 @@ export default function InputWithIcon({
     setContact,
     address,
     setAddress,
-    description,
-    setDescription,
+    hours,
+    setHours,
     id,
     location,
     setLocation,
@@ -93,9 +93,9 @@ export default function InputWithIcon({
                     />
                     <InputField
                         className={classes.input}
-                        label="Description"
-                        onChange={e => setDescription(e.target.value)}
-                        value={description}
+                        label="Opening Hours"
+                        onChange={e => setHours(e.target.value)}
+                        value={hours}
                     />
                     <div style={{ display: "flex" }}>
                         <InputField

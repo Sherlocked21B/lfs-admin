@@ -63,7 +63,7 @@ function EditMerchantsDialog({
         longitude: null
     });
     const [category, setCategory] = useState("");
-    const [description, setDescription] = useState("");
+    const [hours, setHours] = useState("");
     const [media, setMedia] = useState(null);
     const [contact, setContact] = useState("");
     const [upload, setUpload] = useState([]);
@@ -72,14 +72,14 @@ function EditMerchantsDialog({
         if (Object.keys(edit).length > 0 && edit.constructor === Object) {
             setId(edit._id);
             setName(edit.name);
-            setDiscount(edit.discount);
+            setDiscount(edit.discount || "5");
             setAddress(edit.address);
             setLocation({
                 latitude: edit.location[0] || "N/A",
                 longitude: edit.location[1] || "N/A"
             });
             setCategory(edit.category);
-            setDescription(edit.description);
+            setHours(edit.hours || "8 am - 12 pm");
             setMedia(edit.media !== undefined ? edit.media : {});
             setContact(edit.contact);
         }
@@ -171,7 +171,7 @@ function EditMerchantsDialog({
             location: [location.latitude, location.longitude],
             category: category,
             // email: email,
-            // description: description ,
+            hours: hours,
             contact: contact
         });
         console.log(data);
@@ -251,8 +251,8 @@ function EditMerchantsDialog({
                         setLocation={setLocation}
                         category={category}
                         setCategory={setCategory}
-                        description={description}
-                        setDescription={setDescription}
+                        hours={hours}
+                        setHours={setHours}
                         contact={contact}
                         setContact={setContact}
                         setMedia={setUpload}

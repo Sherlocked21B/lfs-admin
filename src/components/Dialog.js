@@ -54,8 +54,9 @@ function AddDialog({
         longitude: ""
     });
     const [category, setCategory] = useState("");
-    const [description, setDescription] = useState("");
+    const [hours, setHours] = useState("8 am - 12 pm");
     const [contact, setContact] = useState("");
+    const [discount, setDiscount] = useState(5);
 
     const [isActive, setIsActive] = useState(false);
 
@@ -63,12 +64,13 @@ function AddDialog({
         setIsActive(true);
         const data = Object.freeze({
             name: name,
-            email: email || "",
+            discount: discount || 5,
             address: address,
             location: [location.latitude, location.longitude],
             category: category,
-            // description: description ,
-            contact: contact
+            discount: discount,
+            contact: contact,
+            hours: hours
         });
         createMerchant({ token, body: JSON.stringify(data) })
             .then(res => {
@@ -146,10 +148,12 @@ function AddDialog({
                         setLocation={setLocation}
                         category={category}
                         setCategory={setCategory}
-                        description={description}
-                        setDescription={setDescription}
+                        hours={hours}
+                        setHours={setHours}
                         contact={contact}
                         setContact={setContact}
+                        discount={discount}
+                        setDiscount={setDiscount}
                     />
                 </List>
             </Dialog>
