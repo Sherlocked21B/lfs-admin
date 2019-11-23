@@ -2,7 +2,7 @@ import React from "react";
 import TextField from "@material-ui/core/TextField";
 import Grid from "@material-ui/core/Grid";
 import AccountCircle from "@material-ui/icons/AccountCircle";
-import MailIcon from "@material-ui/icons/Mail";
+import MoneyOffIcon from "@material-ui/icons/MoneyOff";
 import HomeIcon from "@material-ui/icons/Home";
 import CategoryIcon from "@material-ui/icons/Category";
 import PhoneIcon from "@material-ui/icons/Phone";
@@ -15,8 +15,8 @@ export default function InputField({ label, onChange, value }) {
             <Grid item>
                 {label === "Name" ? (
                     <AccountCircle />
-                ) : label === "Email" ? (
-                    <MailIcon />
+                ) : label === "Discount" ? (
+                    <MoneyOffIcon />
                 ) : label === "Contact" ? (
                     <PhoneIcon />
                 ) : label === "Address" ? (

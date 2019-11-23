@@ -37,8 +37,8 @@ export default function InputWithIcon({
     setName,
     category,
     setCategory,
-    email,
-    setEmail,
+    discount,
+    setDiscount,
     contact,
     setContact,
     address,
@@ -73,9 +73,9 @@ export default function InputWithIcon({
                     />
                     <InputField
                         className={classes.input}
-                        label="Email"
-                        onChange={e => setEmail(e.target.value)}
-                        value={email}
+                        label="Discount"
+                        onChange={e => setDiscount(e.target.value)}
+                        value={discount}
                     />
                     <InputField
                         className={classes.input}

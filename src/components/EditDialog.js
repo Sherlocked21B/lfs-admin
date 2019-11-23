@@ -56,7 +56,7 @@ function EditMerchantsDialog({
 
     const [id, setId] = useState(null);
     const [name, setName] = useState("");
-    const [email, setEmail] = useState("");
+    const [discount, setDiscount] = useState("");
     const [address, setAddress] = useState("");
     const [location, setLocation] = useState({
         latitude: null,
@@ -72,7 +72,7 @@ function EditMerchantsDialog({
         if (Object.keys(edit).length > 0 && edit.constructor === Object) {
             setId(edit._id);
             setName(edit.name);
-            setEmail(edit.email);
+            setDiscount(edit.discount);
             setAddress(edit.address);
             setLocation({
                 latitude: edit.location[0] || "N/A",
@@ -166,10 +166,11 @@ function EditMerchantsDialog({
         setIsActive(true);
         const data = Object.freeze({
             name: name,
-            email: email || "",
+            discount: discount || "",
             address: address,
             location: [location.latitude, location.longitude],
             category: category,
+            // email: email,
             // description: description ,
             contact: contact
         });
@@ -242,8 +243,8 @@ function EditMerchantsDialog({
                     <InputWithIcon
                         name={name}
                         setName={setName}
-                        email={email}
-                        setEmail={setEmail}
+                        discount={discount}
+                        setDiscount={setDiscount}
                         address={address}
                         setAddress={setAddress}
                         location={location}

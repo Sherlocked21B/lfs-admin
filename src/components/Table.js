@@ -55,7 +55,9 @@ function MerchantsTable({
 
     const columns = [
         { title: "Name", field: "name" },
-        { title: "Email", field: "mail" },
+        { title: "Id", field: "_id" },
+        { title: "Discount", field: "discount" },
+        // { title: "Email", field: "mail" },
         {
             title: "Category",
             field: "category",
@@ -105,7 +107,7 @@ function MerchantsTable({
                 </>
             )
         },
-        { title: "Description", field: "description" },
+        // { title: "Description", field: "description" },
         {
             title: "Images",
             field: "url",
