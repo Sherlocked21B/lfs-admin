@@ -202,7 +202,22 @@ function EditMerchantsDialog({
             id,
             token,
             name
-        }).then(res => console.log(res));
+        }).then(res => {
+            if (!res.error && res.media) {
+                setMedia(res.media);
+                editMerchant({ ...edit, media: res.media });
+                toggleSnackBar({
+                    open: true,
+                    variant: "success",
+                    message: "Image deleted!"
+                });
+            } else
+                toggleSnackBar({
+                    open: true,
+                    variant: "error",
+                    message: "Error deleting images!"
+                });
+        });
     };
 
     return (
